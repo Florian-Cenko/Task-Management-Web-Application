@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: taskdb
       POSTGRES_USER: taskmanagementuser
-      POSTGRES_PASSWORD: taskmanagement123
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
