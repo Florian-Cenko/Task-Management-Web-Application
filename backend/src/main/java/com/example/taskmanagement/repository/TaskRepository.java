@@ -1,5 +1,6 @@
 package com.example.taskmanagement.repository;
 
+import com.example.taskmanagement.TaskStatus;
 import org.hibernate.engine.spi.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.taskmanagement.model.Task;
@@ -14,5 +15,5 @@ public interface TaskRepository extends JpaRepository<Task,Long> {
     List<Task> findByTitle(String title);
 
     //Filter Tasks from Status
-    List<Task> findByTaskStatusEnum(Status status);
+    List<Task> findByTaskStatusEnum(TaskStatus status);
 }

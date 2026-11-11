@@ -1,4 +1,5 @@
 package com.example.taskmanagement.controller;
+import com.example.taskmanagement.TaskStatus;
 import com.example.taskmanagement.model.Task;
 import com.example.taskmanagement.service.TaskService;
 import jakarta.validation.Valid;
@@ -27,9 +28,7 @@ public class TaskController {
     @GetMapping("/{id}")
     // I want to return a ResponseEntity because I need to know HTTP Status codes!!
     public ResponseEntity<Task> getTaskById(@PathVariable Long id){
-        return taskService.getATask(id)
-                          .map(task -> ResponseEntity.ok(task))
-                          .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(taskService.getATask(id));
     }
 
     // Creates a new task
@@ -42,20 +41,13 @@ public class TaskController {
     // Updates an existing task
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable Long id, @RequestBody Task updatedTask){
-        return taskService.updateTask(id,updatedTask)
-                   .map(task -> ResponseEntity.ok(task))
-                   .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(taskService.updateTask(id,updatedTask));
     }
 
     // Deletes a task by its ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Task> deleteTask(@PathVariable Long id){
-        boolean deleted = taskService.deleteTask(id);
-
-        if (!deleted) {
-            return ResponseEntity.notFound().build();
-        }
-
+        taskService.deleteTask(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -67,7 +59,7 @@ public class TaskController {
 
     // Filters tasks by status
     @GetMapping("/status")
-    public List<Task> filterTasks(@RequestParam Status status){
+    public List<Task> filterTasks(@RequestParam TaskStatus status){
         return taskService.findTasksByStatus(status);
     }
 
