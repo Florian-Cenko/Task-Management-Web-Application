@@ -32,7 +32,6 @@ public class Task {
     @Size(max = 200, message = "Description cannot exceed 200 characters")
     private String description;
 
-    @NotNull(message = "Task status is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "task_status")
     private TaskStatus taskStatusEnum;
