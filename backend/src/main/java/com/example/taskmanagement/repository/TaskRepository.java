@@ -10,10 +10,6 @@ import java.util.List;
 
 public interface TaskRepository extends JpaRepository<Task,Long> {
 
-    //Spring Data JPA creates queries from names of methods
-    //Find Tasks from Title
     List<Task> findByTitle(String title);
-
-    //Filter Tasks from Status
     List<Task> findByTaskStatusEnum(TaskStatus status);
 }

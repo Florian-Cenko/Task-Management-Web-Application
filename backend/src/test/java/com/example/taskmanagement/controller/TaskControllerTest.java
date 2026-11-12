@@ -1,4 +1,3 @@
-
 package com.example.taskmanagement.controller;
 
 import com.example.taskmanagement.model.Task;
@@ -19,30 +18,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
+// Load only the web layer (Controller) without starting the whole app/DB
 @WebMvcTest(TaskController.class)
 class TaskControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private MockMvc mockMvc; // Simulates HTTP requests
 
     @MockitoBean
-    private TaskService taskService;
+    private TaskService taskService; // Mock the service layer
 
-
-    // First Test: Check if a task is created successfully
     @Test
     void createTask_shouldReturnCreated() throws Exception {
-
-        // Arrange: Create a task and define the mock service response
         Task task = new Task();
         task.setTitle("Test Task");
 
-        when(taskService.createTask(any(Task.class)))
-                .thenReturn(task);
+        // Tell the mock service what to return when createTask is called
+        when(taskService.createTask(any(Task.class))).thenReturn(task);
 
-        // Act: Send a POST request to create a task
-        // Assert: Check the HTTP status and response body
+        // Send POST request with JSON body and expect 201 Created
         mockMvc.perform(post("/api/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -54,44 +48,29 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.title").value("Test Task"));
     }
 
-
-    // Second Test: Check if a task is returned by its ID
     @Test
     void getTaskById_shouldReturnTask() throws Exception {
-
-        // Arrange: Define the task ID and mock service response
         Long taskId = 1L;
-
         Task task = new Task();
         task.setTitle("Test Task");
 
-        when(taskService.getATask(taskId))
-                .thenReturn(task);
+        when(taskService.getATask(taskId)).thenReturn(task);
 
-        // Act: Send a GET request to retrieve the task
-        // Assert: Check that the response is HTTP 200 and contains the task title
+        // Send GET request and expect 200 OK with the task title
         mockMvc.perform(get("/api/tasks/{id}", taskId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Test Task"));
     }
 
-
-    // Third Test: Check if a task is deleted successfully
     @Test
     void deleteTask_shouldReturnNoContent() throws Exception {
-
-        // Arrange: Define the task ID
         Long taskId = 1L;
-
-        // Define that the mock service does nothing when deleteTask is called
         doNothing().when(taskService).deleteTask(taskId);
 
-        // Act: Send a DELETE request
-        // Assert: Check that the response is HTTP 204 No Content
+        // Send DELETE request and expect 204 No Content
         mockMvc.perform(delete("/api/tasks/{id}", taskId))
                 .andExpect(status().isNoContent());
 
-        // Verify: Check that the service delete method was called
         verify(taskService).deleteTask(taskId);
     }
 }

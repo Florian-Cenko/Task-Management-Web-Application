@@ -3,6 +3,8 @@ package com.example.taskmanagement.model;
 import com.example.taskmanagement.TaskStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -23,10 +25,14 @@ public class Task {
     private Long id;
 
     @NotBlank(message = "Title cannot be blank")
-    @Column(nullable = false) // also cannot be null
+    @Column(nullable = false)
+    @Size(min = 3, max = 20, message = "Title must be between 3 and 20 characters")
     private String title;
+
+    @Size(max = 200, message = "Description cannot exceed 200 characters")
     private String description;
 
+    @NotNull(message = "Task status is required")
     @Enumerated(EnumType.STRING)
     @Column(name = "task_status")
     private TaskStatus taskStatusEnum;

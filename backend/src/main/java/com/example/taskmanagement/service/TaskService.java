@@ -49,11 +49,9 @@ public class TaskService {
         taskRepository.deleteById(id);
     }
 
-
     public List<Task> findTasksByTitle(String title){
         return taskRepository.findByTitle(title);
     }
-
     public List<Task> findTasksByStatus(TaskStatus status){
         return taskRepository.findByTaskStatusEnum(status);
     }

@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 
 export default function TaskForm({ onTaskAdded }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [status, setStatus] = useState("PENDING");
+    const [taskStatusEnum, setTaskStatusEnum] = useState("PENDING");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,12 +13,12 @@ export default function TaskForm({ onTaskAdded }) {
         await onTaskAdded({
             title: title.trim(),
             description: description.trim(),
-            status
+            taskStatusEnum
         });
 
         setTitle("");
         setDescription("");
-        setStatus("PENDING");
+        setTaskStatusEnum("PENDING");
     };
 
     return (
@@ -61,8 +60,8 @@ export default function TaskForm({ onTaskAdded }) {
                     Status
                 </label>
                 <select
-                    value={status}
-                    onChange={e => setStatus(e.target.value)}
+                    value={taskStatusEnum}
+                    onChange={e => setTaskStatusEnum(e.target.value)}
                     className="w-full p-3 border rounded-lg"
                 >
                     <option value="PENDING">PENDING</option>

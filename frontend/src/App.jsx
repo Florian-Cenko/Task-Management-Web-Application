@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 import TaskList from "./components/TaskList";
@@ -21,15 +20,45 @@ export default function App() {
     const [showForm, setShowForm] = useState(false);
     const [editingTask, setEditingTask] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Hardcoded credentials (ίδια με το Backend: admin / password123)
+    const USERNAME = 'admin';
+    const PASSWORD = 'password123';
+
+    // Δημιουργία του Authorization Header σε Base64
+    const getAuthHeaders = () => {
+        return {
+            'Authorization': 'Basic ' + btoa(`${USERNAME}:${PASSWORD}`),
+            'Content-Type': 'application/json'
+        };
+    };
 
     // Load tasks from backend
     const loadTasks = async () => {
         try {
             setLoading(true);
-            const data = await getAllTasks();
+            setError(null);
+
+            const response = await fetch('http://localhost:8080/api/tasks', {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
+
+            // Έλεγχος αν αποτύχει η πιστοποίηση (401 Unauthorized)
+            if (response.status === 401) {
+                throw new Error('401 Unauthorized: Invalid username or password!');
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to load tasks.');
+            }
+
+            const data = await response.json();
             setTasks(data);
-        } catch (error) {
-            console.error("Failed to load tasks:", error);
+        } catch (err) {
+            console.error("Failed to load tasks:", err);
+            setError(err.message);
         } finally {
             setLoading(false);
         }
@@ -42,19 +71,50 @@ export default function App() {
     // Add task
     const handleAddTask = async (taskData) => {
         try {
-            const newTask = await addTask(taskData);
+            setError(null);
+            const response = await fetch('http://localhost:8080/api/tasks', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(taskData)
+            });
+
+            if (response.status === 401) {
+                throw new Error('401 Unauthorized: You do not have permission to add tasks.');
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to add task.');
+            }
+
+            const newTask = await response.json();
             setTasks(prev => [...prev, newTask]);
             setShowForm(false);
         } catch (error) {
             console.error("Failed to add task:", error);
-            alert("Failed to add task.");
+            setError(error.message);
+            alert(error.message);
         }
     };
 
     // Update task
     const handleUpdateTask = async (id, taskData) => {
         try {
-            const updatedTask = await updateTask(id, taskData);
+            setError(null);
+            const response = await fetch(`http://localhost:8080/api/tasks/${id}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(taskData)
+            });
+
+            if (response.status === 401) {
+                throw new Error('401 Unauthorized: You do not have permission to update tasks.');
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to update task.');
+            }
+
+            const updatedTask = await response.json();
 
             setTasks(prev =>
                 prev.map(task =>
@@ -65,14 +125,14 @@ export default function App() {
             setEditingTask(null);
         } catch (error) {
             console.error("Failed to update task:", error);
-            alert("Failed to update task.");
+            setError(error.message);
+            alert(error.message);
         }
     };
 
     // Update task status
     const handleUpdateStatus = (id, newStatus) => {
         const taskToUpdate = tasks.find(task => task.id === id);
-
         if (!taskToUpdate) return;
 
         const updatedPayload = {
@@ -96,14 +156,27 @@ export default function App() {
     // Delete task
     const handleDeleteTask = async (id) => {
         try {
-            await deleteTask(id);
+            setError(null);
+            const response = await fetch(`http://localhost:8080/api/tasks/${id}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
+
+            if (response.status === 401) {
+                throw new Error('401 Unauthorized: You do not have permission to delete tasks.');
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to delete task.');
+            }
 
             setTasks(prev =>
                 prev.filter(task => task.id !== id)
             );
         } catch (error) {
             console.error("Failed to delete task:", error);
-            alert("Failed to delete task.");
+            setError(error.message);
+            alert(error.message);
         }
     };
 
@@ -142,6 +215,13 @@ export default function App() {
                         + Add New Task
                     </button>
                 </header>
+
+                {/* Error Banner (Εμφανίζει αν υπάρχει 401 Unauthorized ή άλλο σφάλμα) */}
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6">
+                        <strong>Security / Error: </strong> {error}
+                    </div>
+                )}
 
                 {/* Add Task Modal */}
                 <TaskModal

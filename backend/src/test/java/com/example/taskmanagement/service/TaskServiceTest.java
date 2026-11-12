@@ -15,165 +15,115 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
+// Unit tests for business logic using Mockito (no Spring context needed)
 @ExtendWith(MockitoExtension.class)
-class TaskServiceTest{
+class TaskServiceTest {
 
     @Mock
     private TaskRepository taskRepository;
 
     @InjectMocks
-    private TaskService taskService;
+    private TaskService taskService; // Injects the mock repository into the service
 
-    //First Test: I want to see if a task is created successfully
     @Test
-    void createTask_shouldReturnSavedTask(){
-
-        // Arrange
+    void createTask_shouldReturnSavedTask() {
         Task task = new Task();
         task.setTitle("Test Task 1");
 
-        when(taskRepository.save(any(Task.class)))
-                .thenReturn(task);
+        when(taskRepository.save(any(Task.class))).thenReturn(task);
 
-        //Act
         Task result = taskService.createTask(task);
 
-        //Assert
         assertNotNull(result);
         assertEquals("Test Task 1", result.getTitle());
-
         verify(taskRepository).save(task);
     }
 
-    // Second Test : I want to see if the getAllTasks method runs correclty
     @Test
-    void getAllTasks_shouldReturnAllTasks(){
-
-        //Arrange
+    void getAllTasks_shouldReturnAllTasks() {
         List<Task> tasks = List.of(new Task(), new Task());
-
         when(taskRepository.findAll()).thenReturn(tasks);
 
-        //Act
         List<Task> result = taskService.getAllTasks();
 
-        //Assert
         assertEquals(tasks.size(), result.size());
-
         verify(taskRepository).findAll();
-
     }
 
-    // Third Test : I want to see if the getATask method runs correclty
     @Test
-    void getATask_shouldReturnTaskWhenFound(){
-
-        //Arrange
+    void getATask_shouldReturnTaskWhenFound() {
         Long taskId = 1L;
         Task task = new Task();
-
         task.setTitle("Test Task 3");
 
         when(taskRepository.findById(taskId)).thenReturn(Optional.of(task));
 
-        //Act
         Task result = taskService.getATask(taskId);
 
-        //Assert
         assertEquals(task.getTitle(), result.getTitle());
         verify(taskRepository).findById(taskId);
-
     }
 
-    // Fourth Test : I want to see if the updateTask method runs correclty
     @Test
-    void updateTask_shouldReturnUpdatedTask(){
-
-        //Arrange
+    void updateTask_shouldReturnUpdatedTask() {
         Long taskId = 1L;
-
         Task existingTask = new Task();
         existingTask.setTitle("Old Test Task 4");
 
         Task updatedTask = new Task();
         updatedTask.setTitle("New Test Task 4");
 
-        when(taskRepository.findById(taskId))
-                .thenReturn(Optional.of(existingTask));
+        // Mock finding the existing task and saving the updated one
+        when(taskRepository.findById(taskId)).thenReturn(Optional.of(existingTask));
+        when(taskRepository.save(any(Task.class))).thenReturn(existingTask);
 
-        when(taskRepository.save(any(Task.class)))
-                .thenReturn(existingTask);
-        //Act
         Task result = taskService.updateTask(taskId, updatedTask);
 
-        //Assert
         assertEquals("New Test Task 4", result.getTitle());
-
-        // Verify
         verify(taskRepository).findById(taskId);
         verify(taskRepository).save(existingTask);
     }
 
-    // Fifth Test : I want to see if the updateTask method runs correclty if task not found
     @Test
-    void  updateTask_shouldThrowExceptionWhenTaskNotFound(){
-
-        //Arrange
+    void updateTask_shouldThrowExceptionWhenTaskNotFound() {
         Long taskId = 1L;
-
         Task updatedTask = new Task();
         updatedTask.setTitle("New Test Task 5");
 
+        // Simulate task not existing in DB
         when(taskRepository.findById(taskId)).thenReturn(Optional.empty());
 
-        // Act & Assert
+        // Expect our custom exception to be thrown and save() never to be called
         assertThrows(ResourceNotFoundException.class, () -> {
             taskService.updateTask(taskId, updatedTask);
         });
 
-        // Verify
         verify(taskRepository).findById(taskId);
         verify(taskRepository, never()).save(any(Task.class));
     }
 
-    // Sixth Test : I want to see if the deleteTask method runs correclty
     @Test
-    void deleteTask_shouldDeleteTask(){
-
-        //Arrange
+    void deleteTask_shouldDeleteTask() {
         Long taskId = 1L;
-
         when(taskRepository.existsById(taskId)).thenReturn(true);
 
-        //Act
         taskService.deleteTask(taskId);
 
-        //Assert / Verify
         verify(taskRepository).existsById(taskId);
         verify(taskRepository).deleteById(taskId);
-
     }
 
-    // Seventh Test : I want to see if the deleteTask method runs correclty for task not found
     @Test
-    void deleteTask_shouldThrowExceptionWhenTaskNotFound(){
-
-        //Arrange
+    void deleteTask_shouldThrowExceptionWhenTaskNotFound() {
         Long taskId = 1L;
-
         when(taskRepository.existsById(taskId)).thenReturn(false);
 
-        //Act and Assert
+        // Expect ResourceNotFoundException if ID doesn't exist
         assertThrows(ResourceNotFoundException.class, () -> {
             taskService.deleteTask(taskId);
         });
 
-        //Verify
         verify(taskRepository).existsById(taskId);
         verify(taskRepository, never()).deleteById(taskId);
     }
-
-
-
 }
