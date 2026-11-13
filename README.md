@@ -36,12 +36,25 @@ git clone https://github.com/<your-username>/<your-repository-name>.git
 cd <your-repository-name>
 ```
 
-### 2. Start the Database (PostgreSQL)
-In the root directory of the Backend (where `docker-compose.yml` is located), set the `DB_PASSWORD` environment variable (or create a `.env` file containing `DB_PASSWORD=your_password`) and run:
-```bash
-docker-compose up -d
-```
-The database will start on port `5432` with the database name `taskdb` and user `taskmanagementuser`.
+### 2.Start the Database (PostgreSQL)
+
+The project uses Docker Compose to run a PostgreSQL 16 database.
+
+In the directory containing the docker-compose.yml file, create a .env file with the following configuration:
+
+POSTGRES_DB=taskdb
+POSTGRES_USER=taskmanagementuser
+POSTGRES_PASSWORD=your_password
+
+Note: Replace your_password with your own database password. The .env file should not be committed to GitHub.
+
+Start the database by running:
+
+docker compose up -d
+
+The PostgreSQL database will be available at localhost:5432.
+
+The database name, username, and password must match the credentials configured in the Spring Boot application.
 
 ### 3. Start the Backend
 Ensure that Spring Boot's `application.properties` / `application.yml` is configured with the corresponding database credentials. You can start the Backend in two ways:
