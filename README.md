@@ -42,10 +42,11 @@ The project uses Docker Compose to run a PostgreSQL 16 database.
 
 In the directory containing the docker-compose.yml file, create a .env file with the following configuration:
 
+```bash
 POSTGRES_DB=taskdb
 POSTGRES_USER=taskmanagementuser
 POSTGRES_PASSWORD=your_password
-
+```
 Note: Replace your_password with your own database password. The .env file should not be committed to GitHub.
 
 Start the database by running:
