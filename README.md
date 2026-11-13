@@ -47,11 +47,12 @@ POSTGRES_DB=taskdb
 POSTGRES_USER=taskmanagementuser
 POSTGRES_PASSWORD=your_password
 ```
-Note: Replace your_password with your own database password. The .env file should not be committed to GitHub.
+* **Note:** Replace your_password with your own database password. The .env file should not be committed to GitHub.
 
 Start the database by running:
-
+```bash
 docker compose up -d
+```
 
 The PostgreSQL database will be available at localhost:5432.
 
