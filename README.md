@@ -75,12 +75,6 @@ docker compose up -d
 
 This starts the PostgreSQL 16 container.
 
-The database will be available at:
-
-```text
-localhost:5432
-```
-
 ### 4. Start the Backend
 
 Navigate to the backend directory:
