@@ -61,7 +61,7 @@ Replace `your_password` with a password of your choice. Use the same password fo
 - The `.env` file is used by Docker Compose to configure the PostgreSQL container.
 - Spring Boot does not automatically load the root `.env` file. The `DB_PASSWORD` environment variable must also be provided when starting the backend.
 - Never commit your actual `.env` file to GitHub. It is included in `.gitignore`.
-- The repository includes an `.env.example` file as a template.
+
 
 ### 3. Start the PostgreSQL Database
 
